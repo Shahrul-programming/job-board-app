@@ -17,4 +17,9 @@ class Job extends Model
         'location',
         'description',
     ];
+
+    public function applications()
+    {
+        return $this->hasMany(JobApplication::class);
+    }
 }

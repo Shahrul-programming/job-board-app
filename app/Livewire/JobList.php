@@ -23,6 +23,11 @@ class JobList extends Component
         $this->jobs = Job::all();
     }
 
+    public function viewJob($jobId)
+    {
+        $this->dispatch('jobViewed', $jobId);
+    }
+
     public function editJob($jobId)
     {
         $this->dispatch('editJob', $jobId);
