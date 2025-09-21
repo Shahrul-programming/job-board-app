@@ -14,6 +14,7 @@ class JobApply extends Component
     use WithFileUploads;
 
     public $showModal = false;
+
     public ?Job $job = null;
 
     // Personal Information
@@ -54,12 +55,15 @@ class JobApply extends Component
 
     public $willing_to_relocate = false;
 
-    #[On('applyForJob')]
+    #[On('apply-for-job')]
     public function applyForJob($jobId)
     {
         $this->job = Job::find($jobId);
         $this->showModal = true;
         $this->resetForm();
+
+        // Close the job-view modal
+        $this->dispatch('closeJobView');
     }
 
     public function submitApplication()
@@ -94,7 +98,12 @@ class JobApply extends Component
             ]);
 
             $this->dispatch('applicationSubmitted');
-            $this->closeModal();
+
+            // Close without reopening job-view after successful submission
+            $this->showModal = false;
+            $this->job = null;
+            $this->resetForm();
+            $this->resetValidation();
 
             session()->flash('message', 'Your application has been submitted successfully!');
 
@@ -105,10 +114,16 @@ class JobApply extends Component
 
     public function closeModal()
     {
+        $jobId = $this->job?->id; // Store job ID before resetting
         $this->showModal = false;
         $this->job = null;
         $this->resetForm();
         $this->resetValidation();
+
+        // Reopen the job-view modal if we have a job ID
+        if ($jobId) {
+            $this->dispatch('jobViewed', $jobId);
+        }
     }
 
     public function render()

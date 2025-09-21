@@ -9,6 +9,7 @@ use Livewire\Component;
 class JobView extends Component
 {
     public ?Job $job = null;
+
     public bool $showModal = false;
 
     #[On('jobViewed')]
@@ -18,10 +19,15 @@ class JobView extends Component
         $this->showModal = true;
     }
 
+    #[On('closeJobView')]
+    public function closeJobView()
+    {
+        $this->closeModal();
+    }
+
     public function applyForJob($jobId)
     {
-        $this->dispatch('applyForJob', $jobId);
-        $this->closeModal();
+        $this->dispatch('apply-for-job', $jobId);
     }
 
     public function closeModal()
