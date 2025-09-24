@@ -10,17 +10,18 @@ use Livewire\Attributes\On;
 class JobList extends Component
 {
     public Collection $jobs;
+    public $currentSearch = '';
 
     #[On('jobCreated')]
     public function handleJobCreated($jobId)
     {
-        $this->jobs->add(Job::find($jobId));
+        $this->refreshJobs();
     }
 
     #[On('jobUpdated')]
     public function handleJobUpdated()
     {
-        $this->jobs = Job::all();
+        $this->refreshJobs();
     }
 
     public function viewJob($jobId)
@@ -35,7 +36,7 @@ class JobList extends Component
 
     public function mount()
     {
-        $this->jobs = Job::all();
+        $this->refreshJobs();
     }
 
     public function deleteJob($jobId)
@@ -44,6 +45,26 @@ class JobList extends Component
         if ($job) {
             $job->delete();
             $this->jobs = $this->jobs->filter(fn($j) => $j->id !== $jobId);
+        }
+    }
+
+    #[On('searchUpdated')]
+    public function handleSearchUpdated($search)
+    {
+        $this->currentSearch = $search;
+        $this->refreshJobs();
+    }
+
+    protected function refreshJobs()
+    {
+        if (empty($this->currentSearch)) {
+            $this->jobs = Job::latest()->get();
+        } else {
+            $this->jobs = Job::where('title', 'like', '%' . $this->currentSearch . '%')
+                ->orWhere('company', 'like', '%' . $this->currentSearch . '%')
+                ->orWhere('location', 'like', '%' . $this->currentSearch . '%')
+                ->latest()
+                ->get();
         }
     }
 

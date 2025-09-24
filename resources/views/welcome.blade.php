@@ -44,11 +44,21 @@
                 </nav>
             @endif
         </header>
-        <div class="flex items-center justify-center w-full transition-opacity opacity-100 duration-750 lg:grow starting:opacity-0">
-            <main class="flex max-w-[335px] w-full flex-col-reverse lg:max-w-6xl lg:flex-row">
+        <div class="flex items-start justify-center w-full transition-opacity opacity-100 duration-750 lg:grow starting:opacity-0">
+            <main class="flex max-w-[335px] w-full flex-col-reverse lg:max-w-6xl lg:flex-row lg:gap-8">
                 {{-- <livewire:hello-world /> --}}
-                <livewire:job-create />
-                <livewire:job-list class="lg:ml-8 lg:w-1/2" />
+                <!-- Left Side: Job Create Form -->
+                <div class="lg:w-1/2">
+                    <livewire:job-create />
+                </div>
+                
+                <!-- Right Side: Search Bar + Job List -->
+                <div class="lg:w-1/2 space-y-6">
+                    <livewire:job-search />
+                    <livewire:job-list />
+                </div>
+                
+                <!-- Hidden Components -->
                 <livewire:job-edit />
                 <livewire:job-view />
                 <livewire:job-apply />

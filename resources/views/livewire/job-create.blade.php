@@ -1,4 +1,4 @@
-<div x-data="{ mounted: false }" x-init="$nextTick(() => mounted = true)" class="max-w-2xl mx-auto">
+<div x-data="{ mounted: false }" x-init="$nextTick(() => mounted = true)" class="max-w-lg mx-auto">
     <div
         x-show="mounted"
         x-transition:enter="transition-all duration-600 ease-out"
@@ -7,7 +7,7 @@
         x-transition:leave="transition-all duration-400 ease-in"
         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
         x-transition:leave-end="opacity-0 translate-y-8 scale-95"
-        class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700">
+        class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700">
         <form wire:submit.prevent="save">
             <!-- Form Header -->
             <div
@@ -18,9 +18,9 @@
                 x-transition:leave="transition-all duration-300 ease-in"
                 x-transition:leave-start="opacity-100 translate-x-0"
                 x-transition:leave-end="opacity-0 translate-x-8"
-                class="mb-6">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Create New Job</h2>
-                <p class="text-gray-600 dark:text-gray-400">Fill in the details below to post a new job listing</p>
+                class="mb-4">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-1">Create New Job</h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Fill in the details below to post a new job listing</p>
             </div>
 
             <!-- Job Title -->
@@ -32,14 +32,14 @@
                 x-transition:leave="transition-all duration-200 ease-in"
                 x-transition:leave-start="opacity-100 translate-y-0"
                 x-transition:leave-end="opacity-0 translate-y-6">
-                <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Job Title *
                 </label>
                 <input
                     type="text"
                     id="title"
                     wire:model="title"
-                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400 dark:hover:border-gray-500 hover:shadow-md focus:shadow-lg"
+                    class="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400 dark:hover:border-gray-500 hover:shadow-md focus:shadow-lg"
                     placeholder="Enter job title"
                     required
                 >
@@ -57,7 +57,7 @@
                 x-transition:leave="transition-all duration-200 ease-in"
                 x-transition:leave-start="opacity-100 translate-y-0"
                 x-transition:leave-end="opacity-0 translate-y-6">
-                <label for="company" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label for="company" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Company *
                 </label>
                 <input
