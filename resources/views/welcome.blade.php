@@ -1,74 +1,108 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+@extends('layouts.app')
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+@section('content')
+<!-- Hero Section -->
+<section class="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center">
+            <h1 class="text-4xl md:text-6xl font-bold text-[#1b1b18] dark:text-[#EDEDEC] mb-6">
+                Find Your Dream Job
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
+                Connect with top employers and discover opportunities that match your skills and passion.
+            </p>
+        </div>
+    </div>
+</section>
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
-
-        <!-- Styles / Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-        @livewireStyles
-    </head>
-    <body class="bg-[#FDFDFC] dark:bg-[#0a0a0a] text-[#1b1b18] flex p-6 lg:p-8 items-center lg:justify-center min-h-screen flex-col">
-        <header class="w-full lg:max-w-4xl max-w-[335px] text-sm mb-6 not-has-[nav]:hidden">
-            @if (Route::has('login'))
-                <nav class="flex items-center justify-end gap-4">
-                    @auth
-                        <a
-                            href="{{ url('/dashboard') }}"
-                            class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] border-[#19140035] hover:border-[#1915014a] border text-[#1b1b18] dark:border-[#3E3E3A] dark:hover:border-[#62605b] rounded-sm text-sm leading-normal"
-                        >
-                            Dashboard
-                        </a>
-                    @else
-                        <a
-                            href="{{ route('login') }}"
-                            class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] text-[#1b1b18] border border-transparent hover:border-[#19140035] dark:hover:border-[#3E3E3A] rounded-sm text-sm leading-normal"
-                        >
-                            Log in
-                        </a>
-
-                        @if (Route::has('register'))
-                            <a
-                                href="{{ route('register') }}"
-                                class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] border-[#19140035] hover:border-[#1915014a] border text-[#1b1b18] dark:border-[#3E3E3A] dark:hover:border-[#62605b] rounded-sm text-sm leading-normal">
-                                Register
-                            </a>
-                        @endif
-                    @endauth
-                </nav>
-            @endif
-        </header>
-        <div class="flex items-start justify-center w-full transition-opacity opacity-100 duration-750 lg:grow starting:opacity-0">
-            <main class="flex max-w-[335px] w-full flex-col-reverse lg:max-w-6xl lg:flex-row lg:gap-8">
-                {{-- <livewire:hello-world /> --}}
-                <!-- Left Side: Job Create Form -->
-                <div class="lg:w-1/2">
-                    <livewire:job-create />
-                </div>
-                
-                <!-- Right Side: Search Bar + Job List -->
-                <div class="lg:w-1/2 space-y-6">
-                    <livewire:job-search />
-                    <livewire:job-list />
-                </div>
-                
-                <!-- Hidden Components -->
-                <livewire:job-edit />
-                <livewire:job-view />
-                <livewire:job-apply />
-            </main>
+<!-- Job Board Section -->
+<section class="py-20 bg-gray-50 dark:bg-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-[#1b1b18] dark:text-[#EDEDEC] mb-4">
+                Latest Opportunities
+            </h2>
+            <p class="text-lg text-gray-600 dark:text-gray-300">
+                Explore the newest job postings and find your next career move.
+            </p>
         </div>
 
-        @if (Route::has('login'))
-            <div class="h-14.5 hidden lg:block"></div>
-        @endif
+        <!-- Interactive Job Board Components -->
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Left Side: Job Create Form (for authenticated users) -->
+            @auth
+                <div class="lg:w-1/2 order-2 lg:order-1">
+                    <div class="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6">
+                        <h3 class="text-xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC] mb-4">
+                            Post a New Job
+                        </h3>
+                        <livewire:job-create />
+                    </div>
+                </div>
+            @endauth
+            
+            <!-- Right Side: Search Bar + Job List -->
+            <div class="@auth lg:w-1/2 @else w-full @endauth order-1 @auth lg:order-2 @endif">
+                <div class="space-y-6">
+                    <!-- Job Search Component -->
+                    <div class="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6">
+                        <h3 class="text-xl font-semibold text-[#1b1b18] dark:text-[#EDEDEC] mb-4">
+                            Find Your Perfect Job
+                        </h3>
+                        <livewire:job-search />
+                    </div>
+                    
+                    <!-- Job List Component -->
+                    <div class="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6">
+                        <livewire:job-list />
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Hidden Components for Modal/Overlay functionality -->
+        <livewire:job-edit />
+        <livewire:job-view />
+        <livewire:job-apply />
+    </div>
+</section>
 
-        @livewireScripts
-    </body>
-</html>
+<!-- Call to Action Section -->
+@guest
+<section class="py-20 bg-blue-600 dark:bg-blue-800">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
+            Ready to Get Started?
+        </h2>
+        <p class="text-xl text-blue-100 mb-8">
+            Join thousands of job seekers and employers who trust our platform.
+        </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            @if (Route::has('register'))
+                <a href="{{ route('register') }}" class="inline-flex items-center px-8 py-4 bg-white text-blue-600 text-lg font-semibold rounded-lg hover:bg-gray-100 transition duration-300 shadow-lg">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                    </svg>
+                    Sign Up Free
+                </a>
+            @endif
+            @if (Route::has('login'))
+                <a href="{{ route('login') }}" class="inline-flex items-center px-8 py-4 border-2 border-white text-white text-lg font-semibold rounded-lg hover:bg-white hover:text-blue-600 transition duration-300">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013 3v1" />
+                    </svg>
+                    Sign In
+                </a>
+            @else
+                <a href="#" class="inline-flex items-center px-8 py-4 border-2 border-white text-white text-lg font-semibold rounded-lg hover:bg-white hover:text-blue-600 transition duration-300">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013 3v1" />
+                    </svg>
+                    Get Started
+                </a>
+            @endif
+        </div>
+    </div>
+</section>
+@endguest
+@endsection

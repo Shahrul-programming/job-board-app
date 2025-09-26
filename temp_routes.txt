@@ -1,0 +1,11 @@
+Route::get('/clear-session', function() {
+    Session::flush();
+    Session::regenerate();
+    Auth::logout();
+    
+    return redirect('/test-session')->with('success', 'Session cleared successfully');
+});
+
+Route::post('/test-session', function() {
+    return redirect('/test-session')->with('success', 'CSRF test successful! Token: ' . csrf_token());
+});

@@ -1,106 +1,303 @@
-<div x-data="{ mounted: false }" x-init="$nextTick(() => mounted = true)" class="w-full px-4 sm:px-6 lg:px-8">
-    <!-- Job Cards -->
+<div 
+    x-data="infiniteScroll()"
+    x-init="init()"
+    id="job-container"
+    class="space-y-8">
+    
+    @if($totalJobs > 0)
+    <div class="text-center mb-6">
+        <p class="text-gray-600 dark:text-gray-300">
+            Showing {{ count($jobs) }} of {{ $totalJobs }} job{{ $totalJobs !== 1 ? 's' : '' }}
+            @if(!empty($currentSearch))
+                for "{{ $currentSearch }}"
+            @endif
+        </p>
+    </div>
+    @endif
+    
     <div class="space-y-4">
         @forelse($jobs as $index => $job)
-            <div
-                x-show="mounted"
-                x-transition:enter="transition-all duration-600 ease-out"
-                x-transition:enter-start="opacity-0 translate-y-8 scale-95"
-                x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-                x-transition:leave="transition-all duration-400 ease-in"
-                x-transition:leave-start="opacity-100 translate-y-0 scale-100"
-                x-transition:leave-end="opacity-0 translate-y-8 scale-95"
-                :style="`transition-delay: ${{ $index * 0.1 }}s`"
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 border border-gray-200 dark:border-gray-700">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
                 <div class="flex justify-between items-start">
                     <div class="flex-1">
-                        <!-- Job Title -->
-                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
-                            {{ $job['title'] }}
-                        </h3>
-
-                        <!-- Company -->
-                        <div class="flex items-center mb-2 group">
-                            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400 mr-2 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                            </svg>
-                            <span class="text-gray-600 dark:text-gray-300 font-medium group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
-                                {{ $job['company'] }}
-                            </span>
-                        </div>
-
-                        <!-- Location -->
-                        <div class="flex items-center mb-3 group">
-                            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400 mr-2 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
-                            <span class="text-gray-600 dark:text-gray-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-200">
-                                {{ $job['location'] }}
-                            </span>
-                        </div>
-
-                        <!-- Posted Date -->
-                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 group">
-                            <svg class="w-4 h-4 mr-1 group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            Posted recently
-                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">{{ $job->title }}</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-2">{{ $job->company }}</p>
+                        <p class="text-gray-600 dark:text-gray-300 mb-2">{{ $job->location }}</p>
+                        <p class="text-sm text-gray-500">Posted {{ $job->created_at->diffForHumans() }}</p>
                     </div>
-                    <!-- Action Buttons -->
                     <div class="ml-4 flex space-x-2">
-
-                        <!-- View Button -->
-                        <button wire:click="viewJob({{ $job->id }})"
-                                class="text-green-500 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 transition-all duration-200 p-2 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20 hover:scale-110 hover:shadow-md"
-                                title="View job details">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                            </svg>
-                        </button>
-
-                        <!-- Edit Button -->
-                        <button wire:click="editJob({{ $job->id }})"
-                                class="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-all duration-200 p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:scale-110 hover:shadow-md"
-                                title="Edit job">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                            </svg>
-                        </button>
-
-                        <!-- Delete Button -->
-                        <button wire:click="deleteJob({{ $job->id }})"
-                                wire:confirm="Are you sure you want to delete this job listing?"
-                                class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-all duration-200 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 hover:scale-110 hover:shadow-md"
-                                title="Delete job">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                            </svg>
-                        </button>
+                        <button wire:click="viewJob({{ $job->id }})" class="text-green-500 hover:text-green-700 p-2">View</button>
+                        @can('editJobs', auth()->user())
+                        <button wire:click="editJob({{ $job->id }})" class="text-blue-500 hover:text-blue-700 p-2">Edit</button>
+                        @endcan
+                        @can('deleteJobs', auth()->user())
+                        <button wire:click="deleteJob({{ $job->id }})" class="text-red-500 hover:text-red-700 p-2" onclick="return confirm('Are you sure you want to delete this job?')">Delete</button>
+                        @endcan
                     </div>
                 </div>
             </div>
         @empty
-            <!-- Empty State -->
-            <div
-                x-show="mounted"
-                x-transition:enter="transition-all duration-600 ease-out delay-300"
-                x-transition:enter-start="opacity-0 translate-y-8 scale-95"
-                x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-                x-transition:leave="transition-all duration-400 ease-in"
-                x-transition:leave-start="opacity-100 translate-y-0 scale-100"
-                x-transition:leave-end="opacity-0 translate-y-8 scale-95"
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-12 text-center border border-gray-200 dark:border-gray-700">
-                <svg class="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m-8 0V6a2 2 0 00-2 2v6m0 0v4a2 2 0 002 2h12a2 2 0 002-2v-4"></path>
-                </svg>
-                <h3 class="text-lg font-medium text-gray-800 dark:text-white mb-2">No jobs found</h3>
-                <p class="text-gray-600 dark:text-gray-400 mb-4">
-                    There are no job listings available at the moment.
-                </p>
+            <div class="text-center py-8">
+                <p class="text-gray-500">No jobs found</p>
+                @can('createJobs', auth()->user())
+                <button wire:click="createJob" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Post a Job</button>
+                @endcan
             </div>
         @endforelse
+        
+        <!-- Loading Skeleton - Show during loading -->
+        <div wire:loading wire:target="loadMoreJobs" class="space-y-4">
+            @for ($i = 1; $i <= 3; $i++)
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700 animate-pulse">
+                <div class="flex justify-between items-start">
+                    <div class="flex-1 space-y-3">
+                        <!-- Title skeleton -->
+                        <div class="h-6 bg-gray-300 dark:bg-gray-600 rounded-md w-3/4 loading-shimmer"></div>
+                        <!-- Company skeleton -->
+                        <div class="h-4 bg-gray-300 dark:bg-gray-600 rounded w-1/2 loading-shimmer"></div>
+                        <!-- Location skeleton -->
+                        <div class="h-4 bg-gray-300 dark:bg-gray-600 rounded w-1/3 loading-shimmer"></div>
+                        <!-- Date skeleton -->
+                        <div class="h-3 bg-gray-300 dark:bg-gray-600 rounded w-1/4 loading-shimmer"></div>
+                    </div>
+                    <div class="ml-4 flex space-x-2">
+                        <!-- Action buttons skeleton -->
+                        <div class="h-8 w-12 bg-gray-300 dark:bg-gray-600 rounded loading-shimmer"></div>
+                        <div class="h-8 w-12 bg-gray-300 dark:bg-gray-600 rounded loading-shimmer"></div>
+                    </div>
+                </div>
+            </div>
+            @endfor
+        </div>
     </div>
+
+    <!-- Infinite Scroll Trigger -->
+    @if($hasMore)
+        <div 
+            x-intersect="loadMore()"
+            class="py-8 text-center">
+            
+            <!-- Loading State - Always show when loading -->
+            <div wire:loading wire:target="loadMoreJobs" class="flex flex-col justify-center items-center space-y-4">
+                <!-- Enhanced Loading Spinner -->
+                <div class="relative">
+                    <div class="animate-spin rounded-full h-12 w-12 border-4 border-gray-300 border-t-blue-600"></div>
+                    <div class="absolute inset-0 rounded-full h-12 w-12 border-4 border-transparent border-b-blue-400 animate-pulse"></div>
+                </div>
+                
+                <!-- Loading Text with Animation -->
+                <div class="flex items-center space-x-1">
+                    <span class="text-blue-600 font-medium">Loading more jobs</span>
+                    <div class="flex space-x-1">
+                        <div class="w-1 h-1 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0ms;"></div>
+                        <div class="w-1 h-1 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 150ms;"></div>
+                        <div class="w-1 h-1 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 300ms;"></div>
+                    </div>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="w-64 bg-gray-200 rounded-full h-2">
+                    <div class="bg-gradient-to-r from-blue-400 to-blue-600 h-2 rounded-full animate-pulse" 
+                         style="width: {{ $totalJobs > 0 ? min((count($jobs) / $totalJobs) * 100, 100) : 0 }}%"></div>
+                </div>
+                
+                <!-- Loading Stats -->
+                <p class="text-sm text-gray-500">
+                    Loaded <span class="font-semibold text-blue-600">{{ count($jobs) }}</span> 
+                    of <span class="font-semibold">{{ $totalJobs }}</span> jobs
+                </p>
+            </div>
+            
+            <!-- Non-loading state -->
+            <div wire:loading.remove wire:target="loadMoreJobs" class="text-gray-500 space-y-2">
+                <div class="flex justify-center">
+                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                    </svg>
+                </div>
+                <p class="text-sm">Scroll down to load more jobs</p>
+                <p class="text-xs text-gray-400">{{ $totalJobs - count($jobs) }} jobs remaining</p>
+            </div>
+        </div>
+    @else
+        <div class="py-8 text-center space-y-4">
+            <!-- Completion Animation -->
+            <div class="flex justify-center">
+                <div class="relative">
+                    <svg class="w-16 h-16 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" stroke-width="2" class="opacity-25"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M9 12l2 2 4-4" class="animate-pulse"/>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="space-y-2">
+                <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300">All jobs loaded!</h3>
+                <p class="text-gray-500">
+                    You've viewed all <span class="font-semibold text-green-600">{{ $totalJobs }}</span> available jobs
+                </p>
+            </div>
+            
+            <!-- Back to Top Button -->
+            <button 
+                onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
+                class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+                </svg>
+                Back to Top
+            </button>
+        </div>
+    @endif
+
+    <script>
+        function infiniteScroll() {
+            return {
+                isScrolling: false,
+                lastScrollTime: 0,
+                
+                init() {
+                    // Throttled scroll listener for better performance
+                    window.addEventListener('scroll', this.throttledHandleScroll.bind(this));
+                    
+                    // Add custom CSS for enhanced animations
+                    this.addCustomStyles();
+                },
+                
+                addCustomStyles() {
+                    if (!document.getElementById('infinite-scroll-styles')) {
+                        const style = document.createElement('style');
+                        style.id = 'infinite-scroll-styles';
+                        style.textContent = `
+                            @keyframes fadeInUp {
+                                from {
+                                    opacity: 0;
+                                    transform: translateY(30px);
+                                }
+                                to {
+                                    opacity: 1;
+                                    transform: translateY(0);
+                                }
+                            }
+                            
+                            @keyframes shimmer {
+                                0% {
+                                    background-position: -200px 0;
+                                }
+                                100% {
+                                    background-position: 200px 0;
+                                }
+                            }
+                            
+                            .loading-shimmer {
+                                background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.4), transparent);
+                                background-size: 200px 100%;
+                                animation: shimmer 1.5s infinite;
+                            }
+                            
+                            .fade-in-up {
+                                animation: fadeInUp 0.6s ease-out;
+                            }
+                            
+                            .loading-pulse {
+                                animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+                            }
+                        `;
+                        document.head.appendChild(style);
+                    }
+                },
+                
+                throttledHandleScroll() {
+                    const now = Date.now();
+                    if (now - this.lastScrollTime > 100) { // Throttle to every 100ms
+                        this.lastScrollTime = now;
+                        this.handleScroll();
+                    }
+                },
+                
+                handleScroll() {
+                    // Prevent multiple simultaneous loading
+                    if (this.isScrolling || this.$wire.loading) return;
+                    
+                    const scrollPosition = window.innerHeight + window.scrollY;
+                    const documentHeight = document.documentElement.scrollHeight;
+                    
+                    // Trigger load when 300px from bottom for smoother experience
+                    if (scrollPosition >= documentHeight - 300) {
+                        this.loadMore();
+                    }
+                },
+                
+                loadMore() {
+                    if (!this.$wire.loading && this.$wire.hasMore && !this.isScrolling) {
+                        this.isScrolling = true;
+                        
+                        // Show visual feedback immediately
+                        this.showLoadingFeedback();
+                        
+                        // Call Livewire method
+                        this.$wire.call('loadMoreJobs').then(() => {
+                            setTimeout(() => {
+                                this.isScrolling = false;
+                                this.addFadeInAnimation();
+                            }, 200);
+                        }).catch(() => {
+                            this.isScrolling = false;
+                        });
+                    }
+                },
+                
+                showLoadingFeedback() {
+                    // Add haptic feedback for mobile if supported
+                    if (navigator.vibrate) {
+                        navigator.vibrate(50);
+                    }
+                    
+                    // Smooth scroll adjustment to keep user in context
+                    const currentJob = document.querySelector('[x-intersect]');
+                    if (currentJob) {
+                        currentJob.scrollIntoView({ 
+                            behavior: 'smooth', 
+                            block: 'center' 
+                        });
+                    }
+                },
+                
+                addFadeInAnimation() {
+                    // Add fade-in animation to newly loaded jobs
+                    const jobCards = document.querySelectorAll('.bg-white, .dark\\:bg-gray-800');
+                    const recentJobs = Array.from(jobCards).slice(-5); // Last 5 loaded jobs
+                    
+                    recentJobs.forEach((card, index) => {
+                        setTimeout(() => {
+                            card.classList.add('fade-in-up');
+                        }, index * 100);
+                    });
+                }
+            }
+        }
+        
+        // Add intersection observer for better performance
+        document.addEventListener('DOMContentLoaded', function() {
+            // Lazy loading for job images if any
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        if (img.dataset.src) {
+                            img.src = img.dataset.src;
+                            img.classList.remove('loading-shimmer');
+                            observer.unobserve(img);
+                        }
+                    }
+                });
+            });
+            
+            // Observe all images with data-src
+            document.querySelectorAll('img[data-src]').forEach(img => {
+                imageObserver.observe(img);
+            });
+        });
+    </script>
 </div>

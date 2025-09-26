@@ -14,8 +14,34 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Create demo users first
+        User::firstOrCreate([
+            'email' => 'admin@demo.com',
+        ], [
+            'name' => 'Admin User',
+            'role' => 'admin',
+            'email_verified_at' => now(),
+            'password' => bcrypt('password'),
+        ]);
 
+        User::firstOrCreate([
+            'email' => 'user@demo.com',
+        ], [
+            'name' => 'Regular User',
+            'role' => 'guest',
+            'email_verified_at' => now(),
+            'password' => bcrypt('password'),
+        ]);
+
+        // Create additional fake users
+        User::factory(10)->create();
+
+        // Create jobs
         Job::factory(50)->create();
+
+        // Seed job applications
+        $this->call([
+            JobApplicationSeeder::class,
+        ]);
     }
 }

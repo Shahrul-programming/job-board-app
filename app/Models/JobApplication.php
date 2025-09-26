@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class JobApplication extends Model
 {
     protected $fillable = [
+        'user_id',
         'job_id',
         'full_name',
         'email',
@@ -21,6 +22,7 @@ class JobApplication extends Model
         'expected_salary',
         'available_start_date',
         'willing_to_relocate',
+        'status',
     ];
 
     protected $casts = [
@@ -31,5 +33,10 @@ class JobApplication extends Model
     public function job(): BelongsTo
     {
         return $this->belongsTo(Job::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

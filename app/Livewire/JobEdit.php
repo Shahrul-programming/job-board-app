@@ -8,10 +8,15 @@ use Livewire\Component;
 class JobEdit extends Component
 {
     public $jobId;
+
     public $title;
+
     public $company;
+
     public $location;
+
     public $description;
+
     public $showModal = false;
 
     #[On('editJob')]
@@ -36,6 +41,18 @@ class JobEdit extends Component
 
     public function update()
     {
+        // Check if user can edit jobs using policy
+        if (! auth()->user()->can('editJobs', auth()->user())) {
+            abort(403, 'Unauthorized. Only administrators can edit jobs.');
+        }
+
+        $this->validate([
+            'title' => 'required|string|max:255',
+            'company' => 'required|string|max:255',
+            'location' => 'required|string|max:255',
+            'description' => 'required|string',
+        ]);
+
         $job = \App\Models\Job::find($this->jobId);
         if ($job) {
             $job->update([
@@ -44,6 +61,8 @@ class JobEdit extends Component
                 'location' => $this->location,
                 'description' => $this->description,
             ]);
+
+            session()->flash('success', 'Job updated successfully!');
         }
 
         $this->dispatch('jobUpdated');

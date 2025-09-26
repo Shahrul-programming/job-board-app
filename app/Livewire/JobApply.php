@@ -58,9 +58,24 @@ class JobApply extends Component
     #[On('apply-for-job')]
     public function applyForJob($jobId)
     {
+        // Check if user is authenticated
+        if (! auth()->check()) {
+            session()->flash('error', 'You must be logged in to apply for jobs. Please login or register first.');
+            $this->dispatch('redirectToLogin');
+
+            return;
+        }
+
         $this->job = Job::find($jobId);
         $this->showModal = true;
         $this->resetForm();
+
+        // Pre-fill form with authenticated user data
+        if (auth()->check()) {
+            $user = auth()->user();
+            $this->full_name = $user->name;
+            $this->email = $user->email;
+        }
 
         // Close the job-view modal
         $this->dispatch('closeJobView');
@@ -68,6 +83,14 @@ class JobApply extends Component
 
     public function submitApplication()
     {
+        // Double-check authentication
+        if (! auth()->check()) {
+            session()->flash('error', 'You must be logged in to apply for jobs.');
+            $this->dispatch('redirectToLogin');
+
+            return;
+        }
+
         $this->validate();
 
         try {
@@ -80,9 +103,10 @@ class JobApply extends Component
                 $coverLetterPath = $this->cover_letter_path->store('cover-letters', 'public');
             }
 
-            // Create the job application
+            // Create the job application with authenticated user
             JobApplication::create([
                 'job_id' => $this->job->id,
+                'user_id' => auth()->id(), // Link to authenticated user
                 'full_name' => $this->full_name,
                 'email' => $this->email,
                 'phone_number' => $this->phone_number,
@@ -95,6 +119,7 @@ class JobApply extends Component
                 'expected_salary' => $this->expected_salary,
                 'available_start_date' => $this->available_start_date,
                 'willing_to_relocate' => $this->willing_to_relocate,
+                'status' => 'pending', // Set default status
             ]);
 
             $this->dispatch('applicationSubmitted');

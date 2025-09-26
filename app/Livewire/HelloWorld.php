@@ -7,6 +7,7 @@ use Livewire\Component;
 class HelloWorld extends Component
 {
     public $message = 'Welcome to Job Board!';
+
     public $count = 0;
 
     public function increment()

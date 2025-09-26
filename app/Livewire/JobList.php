@@ -3,25 +3,34 @@
 namespace App\Livewire;
 
 use App\Models\Job;
-use Illuminate\Database\Eloquent\Collection;
-use Livewire\Component;
+use Illuminate\Support\Collection;
 use Livewire\Attributes\On;
+use Livewire\Component;
 
 class JobList extends Component
 {
     public Collection $jobs;
+
     public $currentSearch = '';
+
+    public $perPage = 5; // Number of jobs to load per batch
+
+    public $hasMore = true; // Whether there are more jobs to load
+
+    public $loading = false; // Loading state for infinite scroll
+
+    public $totalJobs = 0; // Total number of jobs available
 
     #[On('jobCreated')]
     public function handleJobCreated($jobId)
     {
-        $this->refreshJobs();
+        $this->resetJobs();
     }
 
     #[On('jobUpdated')]
     public function handleJobUpdated()
     {
-        $this->refreshJobs();
+        $this->resetJobs();
     }
 
     public function viewJob($jobId)
@@ -36,36 +45,101 @@ class JobList extends Component
 
     public function mount()
     {
-        $this->refreshJobs();
+        $this->jobs = collect();
+        // Delay loading to prevent potential session issues
+        $this->loadMoreJobs();
     }
 
     public function deleteJob($jobId)
     {
+        // Check if user can delete jobs using policy
+        if (! auth()->user()->can('deleteJobs', auth()->user())) {
+            abort(403, 'Unauthorized. Only administrators can delete jobs.');
+        }
+
         $job = Job::find($jobId);
         if ($job) {
             $job->delete();
-            $this->jobs = $this->jobs->filter(fn($j) => $j->id !== $jobId);
+            $this->jobs = $this->jobs->reject(fn ($j) => $j->id == $jobId);
         }
+    }
+
+    public function createJob()
+    {
+        return redirect()->to('/jobs/create');
     }
 
     #[On('searchUpdated')]
     public function handleSearchUpdated($search)
     {
         $this->currentSearch = $search;
-        $this->refreshJobs();
+        $this->resetJobs();
     }
 
+    /**
+     * Load more jobs (for infinite scroll)
+     */
+    public function loadMoreJobs()
+    {
+        if (! $this->hasMore || $this->loading) {
+            return;
+        }
+
+        $this->loading = true;
+
+        // Add a small delay to make loading indicator visible
+        // In production, this can be removed if your queries are slow enough
+        sleep(1);
+
+        // Get the current count of jobs to calculate offset
+        $currentCount = $this->jobs->count();
+
+        // Build query based on search
+        $query = Job::query();
+
+        if (! empty($this->currentSearch)) {
+            $query->where(function ($q) {
+                $q->where('title', 'like', '%'.$this->currentSearch.'%')
+                    ->orWhere('company', 'like', '%'.$this->currentSearch.'%')
+                    ->orWhere('location', 'like', '%'.$this->currentSearch.'%')
+                    ->orWhere('description', 'like', '%'.$this->currentSearch.'%');
+            });
+        }
+
+        // Get total count before modifying query
+        $this->totalJobs = $query->count();
+
+        // Get jobs with pagination
+        $newJobs = $query->latest()
+            ->skip($currentCount)
+            ->take($this->perPage)
+            ->get();
+
+        // Add new jobs to existing collection
+        $this->jobs = $this->jobs->merge($newJobs);
+
+        // Check if there are more jobs to load
+        $this->hasMore = $this->jobs->count() < $this->totalJobs;
+
+        $this->loading = false;
+    }
+
+    /**
+     * Reset jobs and load fresh data (used for search)
+     */
+    protected function resetJobs()
+    {
+        $this->jobs = collect();
+        $this->hasMore = true;
+        $this->loadMoreJobs();
+    }
+
+    /**
+     * Refresh all jobs (legacy method for compatibility)
+     */
     protected function refreshJobs()
     {
-        if (empty($this->currentSearch)) {
-            $this->jobs = Job::latest()->get();
-        } else {
-            $this->jobs = Job::where('title', 'like', '%' . $this->currentSearch . '%')
-                ->orWhere('company', 'like', '%' . $this->currentSearch . '%')
-                ->orWhere('location', 'like', '%' . $this->currentSearch . '%')
-                ->latest()
-                ->get();
-        }
+        $this->resetJobs();
     }
 
     public function render()
