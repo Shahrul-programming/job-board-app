@@ -104,6 +104,9 @@ Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'inde
 Route::get('/applications', [App\Http\Controllers\DashboardController::class, 'applications'])
     ->name('applications.index')->middleware('auth');
 
+Route::patch('/applications/{application}', [App\Http\Controllers\DashboardController::class, 'updateApplication'])
+    ->name('applications.update')->middleware('auth');
+
 // Remove old admin routes - now using single dashboard
 // Route::get('/admin/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
 //     ->name('admin.dashboard')->middleware('auth');

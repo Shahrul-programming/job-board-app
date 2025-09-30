@@ -88,7 +88,7 @@
                                                 @endif
                                                 
                                                 @if($application->status === 'pending')
-                                                    <form method="POST" action="#" class="inline">
+                                                    <form method="POST" action="{{ route('applications.update', $application) }}" class="inline">
                                                         @csrf
                                                         @method('PATCH')
                                                         <button type="submit" name="status" value="approved" 
@@ -97,7 +97,7 @@
                                                         </button>
                                                     </form>
                                                     
-                                                    <form method="POST" action="#" class="inline">
+                                                    <form method="POST" action="{{ route('applications.update', $application) }}" class="inline">
                                                         @csrf
                                                         @method('PATCH')
                                                         <button type="submit" name="status" value="rejected" 

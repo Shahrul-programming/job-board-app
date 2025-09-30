@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Job;
 use App\Models\JobApplication;
 use App\Models\User;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class DashboardController extends Controller
 {
+    use AuthorizesRequests;
     /**
      * Display the main dashboard for both admin and guest users
      */
@@ -66,5 +69,23 @@ class DashboardController extends Controller
             ->paginate(15);
 
         return view('applications.index', compact('applications'));
+    }
+
+    /**
+     * Update application status (Admin only)
+     */
+    public function updateApplication(Request $request, JobApplication $application)
+    {
+        $this->authorize('update', $application);
+
+        $request->validate([
+            'status' => 'required|in:pending,approved,rejected',
+        ]);
+
+        $application->update([
+            'status' => $request->status,
+        ]);
+
+        return redirect()->back()->with('success', 'Application status updated successfully.');
     }
 }
