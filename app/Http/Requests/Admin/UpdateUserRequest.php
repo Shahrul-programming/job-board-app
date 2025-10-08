@@ -4,7 +4,6 @@ namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Password;
 
 class UpdateUserRequest extends FormRequest
 {
@@ -26,8 +25,8 @@ class UpdateUserRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($this->route('user'))],
-            'password' => ['nullable', 'string', Password::defaults()],
-            'role' => ['required', 'string', 'in:user,admin'],
+            'password' => ['nullable', 'string', 'min:8'],
+            'role' => ['required', 'string', 'in:guest,admin'],
         ];
     }
 
@@ -44,7 +43,7 @@ class UpdateUserRequest extends FormRequest
             'email.email' => 'Please provide a valid email address.',
             'email.unique' => 'This email is already registered.',
             'role.required' => 'Role is required.',
-            'role.in' => 'Role must be either user or admin.',
+            'role.in' => 'Role must be either guest or admin.',
         ];
     }
 }

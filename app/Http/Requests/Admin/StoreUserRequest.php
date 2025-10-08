@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rules\Password;
 
 class StoreUserRequest extends FormRequest
 {
@@ -25,8 +24,8 @@ class StoreUserRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', Password::defaults()],
-            'role' => ['required', 'string', 'in:user,admin'],
+            'password' => ['required', 'string', 'min:8'],
+            'role' => ['required', 'string', 'in:guest,admin'],
         ];
     }
 
@@ -44,7 +43,7 @@ class StoreUserRequest extends FormRequest
             'email.unique' => 'This email is already registered.',
             'password.required' => 'Password is required.',
             'role.required' => 'Role is required.',
-            'role.in' => 'Role must be either user or admin.',
+            'role.in' => 'Role must be either guest or admin.',
         ];
     }
 }
