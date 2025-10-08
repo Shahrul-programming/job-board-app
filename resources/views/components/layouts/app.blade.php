@@ -44,7 +44,7 @@
                         @auth
                             <div class="flex items-center space-x-4">
                                 @if(auth()->user()->role === 'admin')
-                                    <a href="{{ route('admin.dashboard') }}" class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] text-[#1b1b18] border border-transparent hover:border-[#19140035] dark:hover:border-[#3E3E3A] rounded-sm text-sm leading-normal">
+                                    <a href="{{ route('dashboard') }}" class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] text-[#1b1b18] border border-transparent hover:border-[#19140035] dark:hover:border-[#3E3E3A] rounded-sm text-sm leading-normal">
                                         Admin Dashboard
                                     </a>
                                 @endif
@@ -98,7 +98,7 @@
                     @auth
                         <div class="px-4 space-y-1">
                             @if(auth()->user()->role === 'admin')
-                                <a href="{{ route('admin.dashboard') }}" class="block px-3 py-2 text-base font-medium text-[#1b1b18] dark:text-[#EDEDEC] hover:bg-gray-100 dark:hover:bg-gray-800">
+                                <a href="{{ route('dashboard') }}" class="block px-3 py-2 text-base font-medium text-[#1b1b18] dark:text-[#EDEDEC] hover:bg-gray-100 dark:hover:bg-gray-800">
                                     Admin Dashboard
                                 </a>
                             @endif

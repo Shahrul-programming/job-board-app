@@ -27,6 +27,41 @@ Route::get('/test-session', function () {
     return view('test-session');
 })->name('test.session');
 
+// Debug route for admin users
+Route::get('/debug-admin-users', function () {
+    $admin = App\Models\User::find(1);
+    if ($admin) {
+        auth()->login($admin);
+
+        return redirect()->route('admin.users');
+    }
+
+    return 'No admin user found';
+})->name('debug.admin.users');
+
+// Direct admin login without redirect
+Route::get('/admin-login', function () {
+    $admin = App\Models\User::where('role', 'admin')->first();
+    if ($admin) {
+        auth()->login($admin);
+        session()->regenerate();
+
+        return 'Logged in as: '.$admin->name.' - <a href="/admin/users">Admin Users (Original)</a> | <a href="/admin/users?simple=1">Admin Users (Simple)</a> | <a href="/test-admin-users">Test Page</a> | <a href="/simple-admin-users">Simple Page</a>';
+    }
+
+    return 'No admin user found';
+})->name('admin.login');
+
+// Test static admin users page
+Route::get('/test-admin-users', function () {
+    return view('admin.test-users');
+})->middleware('auth')->name('test.admin.users');
+
+// Simple admin users page without complex Livewire
+Route::get('/simple-admin-users', function () {
+    return view('admin.simple-users');
+})->middleware('auth')->name('simple.admin.users');
+
 Route::post('/test-session', function () {
     return redirect('/test-session')->with('success', 'CSRF test successful! Token: '.csrf_token());
 });
@@ -106,6 +141,27 @@ Route::get('/applications', [App\Http\Controllers\DashboardController::class, 'a
 
 Route::patch('/applications/{application}', [App\Http\Controllers\DashboardController::class, 'updateApplication'])
     ->name('applications.update')->middleware('auth');
+
+// User Management Routes (Admin only)
+Route::get('/admin/users', function () {
+    return view('admin.users');
+})->name('admin.users')->middleware('auth');
+
+Route::get('/admin/users/create', function () {
+    return view('admin.users.create');
+})->name('admin.users.create')->middleware('auth');
+
+Route::post('/admin/users', [App\Http\Controllers\Admin\UserController::class, 'store'])
+    ->name('admin.users.store')->middleware('auth');
+
+Route::get('/admin/users/{user}/edit', [App\Http\Controllers\Admin\UserController::class, 'edit'])
+    ->name('admin.users.edit')->middleware('auth');
+
+Route::put('/admin/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'update'])
+    ->name('admin.users.update')->middleware('auth');
+
+Route::delete('/admin/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'destroy'])
+    ->name('admin.users.destroy')->middleware('auth');
 
 // Remove old admin routes - now using single dashboard
 // Route::get('/admin/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])

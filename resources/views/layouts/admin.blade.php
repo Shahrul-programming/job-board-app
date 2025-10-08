@@ -15,19 +15,23 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center space-x-8">
-                    <a href="{{ route('admin.dashboard') }}" class="flex items-center">
+                    <a href="{{ route('dashboard') }}" class="flex items-center">
                         <span class="text-2xl font-bold text-blue-600 dark:text-blue-400">Admin Panel</span>
                     </a>
                     
                     <!-- Navigation Links -->
                     <div class="hidden md:flex space-x-6">
-                        <a href="{{ route('admin.dashboard') }}" 
-                           class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.dashboard') ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' : '' }}">
+                        <a href="{{ route('dashboard') }}" 
+                           class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('dashboard') ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' : '' }}">
                             Dashboard
                         </a>
-                        <a href="{{ route('admin.applications') }}" 
-                           class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.applications') ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' : '' }}">
+                        <a href="{{ route('applications.index') }}" 
+                           class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('applications.*') ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' : '' }}">
                             Applications
+                        </a>
+                        <a href="{{ route('admin.users') }}" 
+                           class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('admin.users') ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' : '' }}">
+                            User Management
                         </a>
                     </div>
                 </div>
