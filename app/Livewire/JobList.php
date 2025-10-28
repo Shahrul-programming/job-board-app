@@ -10,19 +10,14 @@ use Livewire\Component;
 class JobList extends Component
 {
     public Collection $jobs;
-
     public $currentSearch = '';
-
-    public $perPage = 5; // Number of jobs to load per batch
-
-    public $hasMore = true; // Whether there are more jobs to load
-
-    public $loading = false; // Loading state for infinite scroll
-
-    public $totalJobs = 0; // Total number of jobs available
+    public $perPage = 5;
+    public $hasMore = true;
+    public $loading = false;
+    public $totalJobs = 0;
 
     #[On('jobCreated')]
-    public function handleJobCreated($jobId)
+    public function handleJobCreated($jobId = null)
     {
         $this->resetJobs();
     }
@@ -35,24 +30,22 @@ class JobList extends Component
 
     public function viewJob($jobId)
     {
-        $this->dispatch('jobViewed', $jobId);
+        return redirect()->route('jobs.show', $jobId);
     }
 
     public function editJob($jobId)
     {
-        $this->dispatch('editJob', $jobId);
+        return redirect()->route('jobs.edit', $jobId);
     }
 
     public function mount()
     {
         $this->jobs = collect();
-        // Delay loading to prevent potential session issues
         $this->loadMoreJobs();
     }
 
     public function deleteJob($jobId)
     {
-        // Check if user can delete jobs using policy
         if (! auth()->user()->can('deleteJobs', auth()->user())) {
             abort(403, 'Unauthorized. Only administrators can delete jobs.');
         }
@@ -76,9 +69,6 @@ class JobList extends Component
         $this->resetJobs();
     }
 
-    /**
-     * Load more jobs (for infinite scroll)
-     */
     public function loadMoreJobs()
     {
         if (! $this->hasMore || $this->loading) {
@@ -86,47 +76,32 @@ class JobList extends Component
         }
 
         $this->loading = true;
-
-        // Add a small delay to make loading indicator visible
-        // In production, this can be removed if your queries are slow enough
         sleep(1);
 
-        // Get the current count of jobs to calculate offset
         $currentCount = $this->jobs->count();
-
-        // Build query based on search
-        $query = Job::query();
+        $query = Job::where('status', 'active');
 
         if (! empty($this->currentSearch)) {
             $query->where(function ($q) {
                 $q->where('title', 'like', '%'.$this->currentSearch.'%')
                     ->orWhere('company', 'like', '%'.$this->currentSearch.'%')
                     ->orWhere('location', 'like', '%'.$this->currentSearch.'%')
-                    ->orWhere('description', 'like', '%'.$this->currentSearch.'%');
+                    ->orWhere('description', 'like', '%'.$this->currentSearch.'%');        
             });
         }
 
-        // Get total count before modifying query
         $this->totalJobs = $query->count();
 
-        // Get jobs with pagination
         $newJobs = $query->latest()
             ->skip($currentCount)
             ->take($this->perPage)
             ->get();
 
-        // Add new jobs to existing collection
         $this->jobs = $this->jobs->merge($newJobs);
-
-        // Check if there are more jobs to load
         $this->hasMore = $this->jobs->count() < $this->totalJobs;
-
         $this->loading = false;
     }
 
-    /**
-     * Reset jobs and load fresh data (used for search)
-     */
     protected function resetJobs()
     {
         $this->jobs = collect();
@@ -134,9 +109,6 @@ class JobList extends Component
         $this->loadMoreJobs();
     }
 
-    /**
-     * Refresh all jobs (legacy method for compatibility)
-     */
     protected function refreshJobs()
     {
         $this->resetJobs();

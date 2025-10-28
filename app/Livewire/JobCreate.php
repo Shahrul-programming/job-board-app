@@ -34,6 +34,7 @@ class JobCreate extends Component
             'company' => $this->company,
             'location' => $this->location,
             'description' => $this->description,
+            'status' => 'pending', // Jobs must be paid to be activated
         ]);
 
         $this->dispatch('jobCreated', $job->id);

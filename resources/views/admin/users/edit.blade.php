@@ -1,18 +1,19 @@
-<x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                {{ __('Edit User') }}
-            </h2>
+@extends('layouts.admin')
+
+@section('title', 'Edit User')
+
+@section('content')
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mb-6 flex items-center justify-between">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Edit User</h1>
             <a href="{{ route('admin.users') }}" class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
                 ← Back to Users
             </a>
         </div>
-    </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+        <div class="max-w-2xl mx-auto">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <form action="{{ route('admin.users.update', $user) }}" method="POST">
                         @csrf
@@ -99,7 +100,7 @@
                             </a>
                             <button 
                                 type="submit" 
-                                class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors duration-200"
                             >
                                 Update User
                             </button>
@@ -109,4 +110,5 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</div>
+@endsection

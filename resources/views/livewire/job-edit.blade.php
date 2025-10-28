@@ -1,7 +1,7 @@
-<div x-data="{ showModal: @entangle('showModal') }" x-cloak>
+<div x-data="{}" x-cloak>
     <!-- Modal -->
     <div
-        x-show="showModal"
+        x-show="$wire.showModal"
         x-transition:enter="transition-all duration-500 ease-out"
         x-transition:enter-start="opacity-0 scale-90"
         x-transition:enter-end="opacity-100 scale-100"

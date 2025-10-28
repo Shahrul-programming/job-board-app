@@ -19,15 +19,24 @@
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">User Management</h1>
                 <p class="text-sm text-gray-600 dark:text-gray-400">Manage system users and their roles</p>
             </div>
-            @can('create', App\Models\User::class)
-                <a href="{{ route('admin.users.create') }}" 
-                   class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200">
+            <div class="flex flex-col sm:flex-row gap-3">
+                @can('create', App\Models\User::class)
+                    <a href="{{ route('admin.users.create') }}" 
+                       class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Add New User
+                    </a>
+                @endcan
+                <a href="{{ route('admin.jobs.create') }}" 
+                   class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors duration-200">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2V6"></path>
                     </svg>
-                    Add New User
+                    Create Job
                 </a>
-            @endcan
+            </div>
         </div>
     </div>
 

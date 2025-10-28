@@ -6,10 +6,19 @@
 <div class="container mx-auto px-6 py-8">
     <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-semibold text-gray-800 dark:text-white">Job Applications</h1>
-        <a href="{{ route('dashboard') }}"
-           class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition duration-200">
-            Back to Dashboard
-        </a>
+        <div class="flex gap-3">
+            <a href="{{ route('admin.jobs.create') }}"
+               class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg transition duration-200 inline-flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Create Job
+            </a>
+            <a href="{{ route('dashboard') }}"
+               class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition duration-200">
+                Back to Dashboard
+            </a>
+        </div>
     </div>
 
     <!-- Applications Table -->

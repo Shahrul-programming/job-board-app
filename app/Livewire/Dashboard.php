@@ -48,12 +48,13 @@ class Dashboard extends Component
         $this->validate();
 
         try {
-            // Create the job
+            // Create the job with pending status
             Job::create([
                 'title' => $this->newJobTitle,
                 'company' => $this->newJobCompany,
                 'location' => $this->newJobLocation,
                 'description' => $this->newJobDescription,
+                'status' => 'pending', // Jobs must be paid to be activated
                 'user_id' => auth()->id(),
             ]);
 
@@ -79,8 +80,8 @@ class Dashboard extends Component
             return redirect()->route('login');
         }
 
-        // Get jobs data
-        $totalJobs = Job::count();
+        // Get jobs data - only count ACTIVE jobs for public display
+        $totalJobs = Job::where('status', 'active')->count();
 
         // Admin-specific data
         $adminData = [];
@@ -93,6 +94,9 @@ class Dashboard extends Component
                     ->take(5)
                     ->get(),
                 'totalUsers' => User::count(),
+                'totalJobsAll' => Job::count(), // All jobs including pending
+                'pendingJobs' => Job::where('status', 'pending')->count(),
+                'activeJobs' => Job::where('status', 'active')->count(),
             ];
         }
 

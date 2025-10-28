@@ -1,9 +1,9 @@
-<div x-data="{ showModal: @entangle('showModal'), job: @entangle('job') }" 
+<div x-data="{}"
      x-cloak
      @redirect-to-login.window="window.location.href = '{{ route('login') }}'">
     <!-- Application Modal -->
     <div
-        x-show="showModal"
+        x-show="$wire.showModal"
         x-transition:enter="transition-all duration-500 ease-out"
         x-transition:enter-start="opacity-0 scale-90"
         x-transition:enter-end="opacity-100 scale-100"

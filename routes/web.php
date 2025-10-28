@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -125,10 +126,20 @@ Route::get('/jobs', [App\Http\Controllers\JobController::class, 'index'])
 Route::get('/jobs/{job}', [App\Http\Controllers\JobController::class, 'show'])
     ->name('jobs.show');
 
-// Protected Job Routes (authentication required)
+// Edit and Update Job Routes (require authentication)
 Route::middleware('auth')->group(function () {
-    Route::get('/jobs/create', [App\Http\Controllers\JobController::class, 'create'])
-        ->name('jobs.create');
+    Route::get('/jobs/{job}/edit', [App\Http\Controllers\JobController::class, 'edit'])
+        ->name('jobs.edit');
+    Route::put('/jobs/{job}', [App\Http\Controllers\JobController::class, 'update'])
+        ->name('jobs.update');
+});
+
+// Protected Job Routes (authentication required)
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/admin/jobs/create', [App\Http\Controllers\JobController::class, 'create'])
+        ->name('admin.jobs.create');
+    Route::post('/admin/jobs', [App\Http\Controllers\JobController::class, 'store'])
+        ->name('admin.jobs.store');
 });
 
 // Dashboard Routes - Single dashboard for both admin and guest
@@ -143,25 +154,27 @@ Route::patch('/applications/{application}', [App\Http\Controllers\DashboardContr
     ->name('applications.update')->middleware('auth');
 
 // User Management Routes (Admin only)
-Route::get('/admin/users', function () {
-    return view('admin.users');
-})->name('admin.users')->middleware('auth');
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/admin/users', function () {
+        return view('admin.users');
+    })->name('admin.users');
 
-Route::get('/admin/users/create', function () {
-    return view('admin.users.create');
-})->name('admin.users.create')->middleware('auth');
+    Route::get('/admin/users/create', function () {
+        return view('admin.users.create');
+    })->name('admin.users.create');
 
-Route::post('/admin/users', [App\Http\Controllers\Admin\UserController::class, 'store'])
-    ->name('admin.users.store')->middleware('auth');
+    Route::post('/admin/users', [App\Http\Controllers\Admin\UserController::class, 'store'])
+        ->name('admin.users.store');
 
-Route::get('/admin/users/{user}/edit', [App\Http\Controllers\Admin\UserController::class, 'edit'])
-    ->name('admin.users.edit')->middleware('auth');
+    Route::get('/admin/users/{user}/edit', [App\Http\Controllers\Admin\UserController::class, 'edit'])
+        ->name('admin.users.edit');
 
-Route::put('/admin/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'update'])
-    ->name('admin.users.update')->middleware('auth');
+    Route::put('/admin/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'update'])
+        ->name('admin.users.update');
 
-Route::delete('/admin/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'destroy'])
-    ->name('admin.users.destroy')->middleware('auth');
+    Route::delete('/admin/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'destroy'])
+        ->name('admin.users.destroy');
+});
 
 // Remove old admin routes - now using single dashboard
 // Route::get('/admin/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
@@ -169,3 +182,47 @@ Route::delete('/admin/users/{user}', [App\Http\Controllers\Admin\UserController:
 
 // Route::get('/admin/applications', [App\Http\Controllers\Admin\DashboardController::class, 'applications'])
 //     ->name('admin.applications')->middleware('auth');
+
+// Checkout Routes
+Route::get('/checkout', function (Request $request) {
+    $stripePriceId = env('STRIPE_PRICE_ID', 'price_deluxe_album');
+    $quantity = 1;
+
+    // Get pending job ID from session
+    $pendingJobId = session('pending_job_id');
+    
+    // Ensure we have a job ID
+    if (!$pendingJobId) {
+        return redirect()->route('dashboard')->with('error', 'No pending job found. Please create a job first.');
+    }
+
+    $checkoutOptions = [
+        'success_url' => route('checkout-success').'?session_id={CHECKOUT_SESSION_ID}&job_id='.$pendingJobId,
+        'cancel_url' => route('checkout-cancel').'?job_id='.$pendingJobId,
+        'metadata' => [
+            'job_id' => $pendingJobId,
+            'user_id' => $request->user()->id,
+            'order_type' => 'job_posting'
+        ],
+    ];
+
+    \Log::info('Creating checkout session', [
+        'job_id' => $pendingJobId,
+        'user_id' => $request->user()->id,
+        'metadata' => $checkoutOptions['metadata']
+    ]);
+
+    return $request->user()->checkout([$stripePriceId => $quantity], $checkoutOptions);
+})->name('checkout')->middleware('auth');
+
+Route::get('/checkout/success', [App\Http\Controllers\CheckoutController::class, 'success'])->name('checkout-success');
+Route::get('/checkout/cancel', [App\Http\Controllers\CheckoutController::class, 'cancel'])->name('checkout-cancel');
+
+// Stripe Webhook
+Route::post('/stripe/webhook', [App\Http\Controllers\StripeWebhookController::class, 'handleWebhook'])
+    ->name('stripe.webhook')
+    ->withoutMiddleware(['csrf', 'auth']);
+
+    Route::get('/ai-test', function () {
+    return view('ai-test');
+})->middleware(['auth'])->name('ai.test');

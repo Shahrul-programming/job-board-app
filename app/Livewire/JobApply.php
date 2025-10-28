@@ -81,6 +81,12 @@ class JobApply extends Component
         $this->dispatch('closeJobView');
     }
 
+    #[On('open-job-apply')]
+    public function openJobApply($jobId)
+    {
+        $this->applyForJob($jobId);
+    }
+
     public function submitApplication()
     {
         // Double-check authentication

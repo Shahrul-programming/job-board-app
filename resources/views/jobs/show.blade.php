@@ -57,7 +57,7 @@
                         
                         @auth
                             <!-- Job Apply trigger for Livewire component -->
-                            <button onclick="window.dispatchEvent(new CustomEvent('open-job-apply', { detail: { jobId: {{ $job->id }} } }));"
+                            <button onclick="applyForJob({{ $job->id }})"
                                     class="px-6 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
                                 Apply Now
                             </button>
@@ -82,6 +82,12 @@
 
 @auth
     <!-- Include Livewire components for authenticated users -->
-    @livewire('job-apply')
+    <livewire:job-apply />
 @endauth
+
+<script>
+    function applyForJob(jobId) {
+        Livewire.dispatch('open-job-apply', { jobId: jobId });
+    }
+</script>
 @endsection
