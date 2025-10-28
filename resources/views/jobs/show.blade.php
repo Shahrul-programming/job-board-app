@@ -30,17 +30,19 @@
 
                     <div class="mb-6">
                         <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Description</h3>
-                        <div class="prose dark:prose-invert max-w-none">
-                            {!! nl2br(e($job->description)) !!}
+                        <div class="prose prose-lg dark:prose-invert max-w-none text-gray-700 dark:text-gray-300">
+                            {!! $job->description !!}
                         </div>
                     </div>
 
+                    @if($job->requirements)
                     <div class="mb-6">
                         <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Requirements</h3>
-                        <div class="prose dark:prose-invert max-w-none">
+                        <div class="prose prose-lg dark:prose-invert max-w-none text-gray-700 dark:text-gray-300">
                             {!! nl2br(e($job->requirements)) !!}
                         </div>
                     </div>
+                    @endif
                 </div>
 
                 <!-- Action Buttons -->

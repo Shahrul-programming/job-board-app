@@ -59,7 +59,19 @@
                             </button>
                         </div>
                         <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-md border dark:border-gray-600 max-w-full overflow-hidden">
-                            <div class="text-sm text-gray-900 dark:text-gray-100 break-words whitespace-pre-wrap overflow-wrap-anywhere">{!! $currentPrompt->getFormattedResponse() !!}</div>
+                            <div class="prose prose-sm max-w-none text-gray-900 dark:text-gray-100
+                                        prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-headings:font-semibold
+                                        prose-h1:text-lg prose-h1:mb-3 prose-h1:mt-4
+                                        prose-h2:text-base prose-h2:mb-2 prose-h2:mt-3
+                                        prose-h3:text-sm prose-h3:mb-2 prose-h3:mt-2
+                                        prose-p:mb-3 prose-p:leading-relaxed
+                                        prose-ul:mb-3 prose-ol:mb-3
+                                        prose-li:mb-1 prose-li:leading-relaxed
+                                        prose-strong:font-semibold prose-strong:text-gray-800 dark:prose-strong:text-gray-200
+                                        prose-em:italic prose-em:text-gray-700 dark:prose-em:text-gray-300
+                                        prose-code:bg-gray-200 dark:prose-code:bg-gray-700 prose-code:px-1 prose-code:py-0.5 prose-code:rounded">
+                                {!! $currentPrompt->getFormattedResponse() !!}
+                            </div>
                         </div>
                     </div>
                 @elseif($currentPrompt->status === 'Failed')

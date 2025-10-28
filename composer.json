@@ -10,7 +10,7 @@
         "laravel/cashier": "^16.0",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
-        "league/commonmark": "*",
+        "league/commonmark": "^2.7",
         "livewire/livewire": "^3.6"
     },
     "require-dev": {

@@ -226,3 +226,62 @@ Route::post('/stripe/webhook', [App\Http\Controllers\StripeWebhookController::cl
     Route::get('/ai-test', function () {
     return view('ai-test');
 })->middleware(['auth'])->name('ai.test');
+
+// AI Component Modal for Job Creation
+Route::post('/ai-component-modal', function (Request $request) {
+    $context = $request->input('context', 'Generate job description for Laravel Developer in Malaysia.');
+    
+    return view('components.ai-modal-content', compact('context'));
+})->middleware(['auth'])->name('ai.modal');
+
+// Get Last AI Result for Import
+Route::get('/get-last-ai-result', function () {
+    $lastPrompt = \App\Models\AiPrompt::where('user_id', auth()->id())
+        ->where('status', 'Completed')
+        ->whereNotNull('response')
+        ->latest()
+        ->first();
+    
+    if ($lastPrompt && $lastPrompt->response) {
+        return response()->json([
+            'success' => true,
+            'response' => $lastPrompt->getPlainResponse(), // Use plain text untuk textarea
+            'created_at' => $lastPrompt->created_at->diffForHumans()
+        ]);
+    }
+    
+    return response()->json([
+        'success' => false,
+        'message' => 'No AI-generated content found. Please generate some content first using the AI Generator.'
+    ]);
+})->middleware(['auth'])->name('ai.last.result');
+
+// Get Temporary AI Response (for modal use)
+Route::get('/get-temp-ai-response', function () {
+    $response = session('temp_ai_response');
+    session()->forget('temp_ai_response'); // Clear after use
+    
+    return response()->json([
+        'response' => $response
+    ]);
+})->middleware(['auth'])->name('ai.temp.response');
+
+// Get Specific AI Prompt Response by ID
+Route::get('/get-ai-prompt/{id}', function ($id) {
+    $prompt = \App\Models\AiPrompt::where('id', $id)
+        ->where('user_id', auth()->id())
+        ->where('status', 'Completed')
+        ->first();
+    
+    if ($prompt && $prompt->response) {
+        return response()->json([
+            'success' => true,
+            'response' => $prompt->getPlainResponse()
+        ]);
+    }
+    
+    return response()->json([
+        'success' => false,
+        'message' => 'AI prompt not found or not yet completed.'
+    ]);
+})->middleware(['auth'])->name('ai.prompt.response');
