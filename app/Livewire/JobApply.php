@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Job;
 use App\Models\JobApplication;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -15,6 +16,7 @@ class JobApply extends Component
 
     public $showModal = false;
 
+    #[Locked]
     public ?Job $job = null;
 
     // Personal Information
@@ -31,7 +33,7 @@ class JobApply extends Component
     #[Validate('required|file|mimes:pdf,doc,docx|max:10240')]
     public $resume;
 
-    #[Validate('nullable|string|max:2000')]
+    #[Validate('nullable|string|max:5000')]
     public $cover_letter = '';
 
     #[Validate('nullable|file|mimes:pdf,doc,docx|max:10240')]
@@ -177,4 +179,6 @@ class JobApply extends Component
         $this->available_start_date = '';
         $this->willing_to_relocate = false;
     }
+
 }
+

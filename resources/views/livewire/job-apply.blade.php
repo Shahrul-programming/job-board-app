@@ -1,6 +1,4 @@
-<div x-data="{}"
-     x-cloak
-     @redirect-to-login.window="window.location.href = '{{ route('login') }}'">
+<div x-data="{}" x-cloak @redirect-to-login.window="window.location.href = '{{ route('login') }}'">
     <!-- Application Modal -->
     <div
         x-show="$wire.showModal"
@@ -164,13 +162,45 @@
                                         x-transition:leave-start="opacity-100 translate-y-0"
                                         x-transition:leave-end="opacity-0 translate-y-4"
                                         class="mb-4">
-                                        <label for="cover_letter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            Cover Letter
-                                        </label>
-                                        <textarea id="cover_letter" wire:model="cover_letter" rows="4"
-                                                  placeholder="Write your cover letter here, or upload a file below..."
-                                                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-all duration-200 hover:border-gray-400 dark:hover:border-gray-500 hover:shadow-md focus:shadow-lg resize-none"></textarea>
-                                        @error('cover_letter') <span class="text-red-500 text-sm animate-in slide-in-from-top-2 duration-200">{{ $message }}</span> @enderror
+                                        <div class="flex items-center justify-between mb-2">
+                                            <label for="cover_letter" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                Cover Letter
+                                            </label>
+                                            <button type="button" 
+                                                    @click="window.openCoverLetterAiModal()" 
+                                                    class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
+                                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                                </svg>
+                                                Generate with AI
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="relative">
+                                            <textarea 
+                                                id="cover_letter" 
+                                                wire:model.live="cover_letter" 
+                                                rows="8"
+                                                maxlength="5000"
+                                                placeholder="Write your cover letter here, or click 'Generate with AI' to create one automatically..."
+                                                class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-all duration-200 hover:border-blue-400 dark:hover:border-blue-500 focus:shadow-lg resize-y"
+                                                style="min-height: 150px;"></textarea>
+                                            
+                                            <!-- Character Counter -->
+                                            <div class="absolute bottom-2 right-2 text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600"
+                                                 x-data="{ count: $wire.cover_letter?.length || 0 }"
+                                                 x-init="$watch('$wire.cover_letter', value => count = value?.length || 0)">
+                                                <span x-text="count" :class="count > 4500 ? 'text-orange-600 font-semibold' : (count > 5000 ? 'text-red-600 font-bold' : 'text-gray-600 dark:text-gray-400')"></span>
+                                                <span class="text-gray-500 dark:text-gray-500">/</span>
+                                                <span class="text-gray-600 dark:text-gray-400">5000</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                            💡 Tip: Use the AI generator for a professional cover letter, then customize it to match your experience.
+                                        </p>
+                                        
+                                        @error('cover_letter') <span class="text-red-500 text-sm animate-in slide-in-from-top-2 duration-200 block mt-1">{{ $message }}</span> @enderror
                                     </div>
 
                                     <!-- Cover Letter File Upload -->
@@ -361,4 +391,35 @@
             {{ session('error') }}
         </div>
     @endif
+    
+    <!-- Cover Letter AI Generator Modal -->
+    <div id="coverLetterAiModal" class="hidden fixed inset-0 z-[100] overflow-y-auto" style="display: none;">
+    <!-- Backdrop -->
+    <div class="fixed inset-0 bg-black bg-opacity-75 transition-opacity" onclick="window.closeCoverLetterAiModal()"></div>
+    
+    <!-- Modal Content -->
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-3xl w-full p-6 transform transition-all">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">AI Cover Letter Generator</h3>
+                <button type="button" onclick="closeCoverLetterAiModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Modal Body -->
+            <div class="mt-4">
+                <div id="coverLetterAiModalContent">
+                    <!-- Livewire component will be loaded here -->
+                    <div class="text-center py-8">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                        <p class="mt-4 text-gray-600 dark:text-gray-400">Loading AI Generator...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

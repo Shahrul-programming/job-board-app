@@ -127,11 +127,12 @@
                     </div>
                 </div>
 
-                <div class="bg-green-50 dark:bg-green-900 p-6 rounded-lg">
+                <a href="{{ route('applications.index') }}" class="block bg-green-50 dark:bg-green-900 p-6 rounded-lg hover:shadow-lg transition-shadow duration-200 transform hover:scale-105">
                     <div class="flex items-center">
                         <div class="flex-1">
                             <h2 class="text-2xl font-bold text-green-600 dark:text-green-300">{{ $guestData['myApplicationsCount'] ?? 0 }}</h2>
                             <p class="text-sm text-green-700 dark:text-green-200">My Applications</p>
+                            <p class="text-xs text-green-600 dark:text-green-300 mt-1">Click to view all →</p>
                         </div>
                         <div class="ml-4">
                             <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -139,7 +140,7 @@
                             </svg>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
         @endif
 

@@ -63,7 +63,7 @@
                         <h4 class="font-medium text-gray-900">Generated Job Description:</h4>
                         <button
                             wire:click="useResponse"
-                            onclick="handleUseResponse({{ $currentPrompt->id }})"
+                            onclick="handleAiUseResponse({{ $currentPrompt->id }})"
                             data-prompt-id="{{ $currentPrompt->id }}"
                             class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center"
                         >

@@ -60,6 +60,12 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
+        // Regular users see their own applications
+        if ($user->role !== 'admin') {
+            return view('applications.my-applications');
+        }
+
+        // Admins see all applications (existing view)
         if (Gate::denies('viewApplications', $user)) {
             abort(403, 'Unauthorized');
         }
